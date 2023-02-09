@@ -1,0 +1,10 @@
+Lab details
+Goal: Setup infrastructure from previous Lab using Terraform (and optionally Ansible)
+For a G: Setup infrastructure with Terraform and Openstack Provider
+For a VG: Everything from G plus using Cloud-init and/or Ansible to deploy the rest of the software (e.g web server installation and file deployment)
+Turn in by: 2023-02-10
+What to turn in: Screenshots of your web page open in your browser and compressed archive of all your terraform (and other related files for the environment) so that I could set it up as well. Send to jonas@sarimner.com
+Extra challenges for going above and beyond!
+- Use Version Control and CI/CD (stuff like Gitlab CI/CD or Github Action) to run when you commit your changes and apply them automatically to the environment
+- Setup an existing open source project (ex. Wordpress, Gitea, etc.) start to finish with infrastructure (Terraform) and Cloud-init or Ansible for configuration/application deployment.
+- If you want something more exotic, let me know... I'll come up with something more "cruel"! 
