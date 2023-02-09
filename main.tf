@@ -1,17 +1,17 @@
 variable "password" {
-  type    = string
+  type = string
 }
 
 variable "user_name" {
-  type    = string
+  type = string
 }
 
 variable "tenant_name" {
-  type    = string
+  type = string
 }
 
 variable "vmbasename" {
-  type = string
+  type    = string
   default = "PatrikVM"
 }
 
@@ -40,16 +40,16 @@ terraform {
 # }
 
 data "external" "public_key" {
-for_each = toset(local.name)
+  for_each = toset(local.name)
   program = [
-    "bash", "-c","jq -r -n --arg pubkey \"$(ssh-keygen -y -f ${each.value}_rsa)\" '{pubkey:$pubkey}'"
+    "bash", "-c", "jq -r -n --arg pubkey \"$(ssh-keygen -y -f ${each.value}_rsa)\" '{pubkey:$pubkey}'"
   ]
-#  depends_on = [data.external.sshkeygen]
+  #  depends_on = [data.external.sshkeygen]
 }
 
 resource "openstack_compute_keypair_v2" "keypair" {
-  for_each = toset(local.name)
-  name       = "${each.value}"
+  for_each   = toset(local.name)
+  name       = each.value
   public_key = data.external.public_key[each.value].result["pubkey"]
   depends_on = [data.external.public_key]
 }
@@ -139,7 +139,7 @@ resource "openstack_compute_instance_v2" "bastion" {
   network {
     uuid = openstack_networking_network_v2.network.id
   }
-  key_pair = openstack_compute_keypair_v2.keypair["bastion"].name
+  key_pair        = openstack_compute_keypair_v2.keypair["bastion"].name
   security_groups = [openstack_compute_secgroup_v2.internet_ssh_sg.name]
   depends_on      = [openstack_networking_subnet_v2.subnet]
   # user_data       = ""
@@ -159,8 +159,8 @@ resource "openstack_compute_instance_v2" "web_cluster" {
     group = openstack_compute_servergroup_v2.web_srvgrp.id
   }
   security_groups = [openstack_compute_secgroup_v2.local_ssh_sg.name, openstack_compute_secgroup_v2.local_http_sg.name]
-  user_data  = file("web_server_script.ci")
-  depends_on = [openstack_networking_subnet_v2.subnet]
+  user_data       = file("web_server_script.ci")
+  depends_on      = [openstack_networking_subnet_v2.subnet]
 }
 
 resource "openstack_compute_servergroup_v2" "web_srvgrp" {
@@ -175,11 +175,11 @@ resource "openstack_lb_loadbalancer_v2" "loadbalancer" {
 }
 
 resource "openstack_lb_listener_v2" "loadbalancerlistener" {
-  name              = "${var.vmbasename}_loadbalancer_listener"
-  protocol          = "HTTP"
-  protocol_port     = 80
-  loadbalancer_id   = openstack_lb_loadbalancer_v2.loadbalancer.id
-  insert_headers    = {
+  name            = "${var.vmbasename}_loadbalancer_listener"
+  protocol        = "HTTP"
+  protocol_port   = 80
+  loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer.id
+  insert_headers = {
     X-Forwarded-For = "true"
   }
 }
@@ -203,7 +203,7 @@ resource "openstack_lb_monitor_v2" "loadbalancer_pool_member_monitor" {
   name        = "${var.vmbasename}_loadbalancer_pool_member_monitor"
   pool_id     = openstack_lb_pool_v2.loadbalancer_pool.id
   type        = "HTTP"
-  url_path    = "/health.html" 
+  url_path    = "/health.html"
   http_method = "GET"
   max_retries = 3
   delay       = 5
@@ -219,7 +219,7 @@ resource "openstack_networking_floatingip_v2" "nfloatips" {
 }
 
 resource "openstack_compute_floatingip_associate_v2" "fip" {
-  instance_id = openstack_compute_instance_v2.bastion.id 
+  instance_id = openstack_compute_instance_v2.bastion.id
   floating_ip = openstack_compute_floatingip_v2.cfloatips.address
 }
 
